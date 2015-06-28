@@ -15,6 +15,7 @@ import os, sys, doctest, traceback, urllib.request, urllib.parse, urllib.error, 
 import hashlib
 import pdb
 
+#command for submission
 #python3 coursera_submit python_lab.py
 
 
