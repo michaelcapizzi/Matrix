@@ -5,6 +5,7 @@ __pycache__/
 .idea/
 .gitignore
 Matrix.iml
+profile.txt
 
 # C extensions
 *.so
