@@ -106,7 +106,14 @@ def add(u,v):
     True
     """
     assert u.D == v.D
-    pass
+
+    new_dict = {}
+
+    for k in u.D:
+        new_dict[k] = u.f.get(k,0) + v.f.get(k,0)
+
+    return Vec(u.D, new_dict)
+
 
 def dot(u,v):
     """
@@ -137,7 +144,8 @@ def dot(u,v):
     12
     """
     assert u.D == v.D
-    pass
+
+    return sum([u.f.get(i,0) * v.f.get(i,0) for i in u.D])
 
 def scalar_mul(v, alpha):
     """
@@ -154,7 +162,17 @@ def scalar_mul(v, alpha):
     >>> u == Vec({'x','y','z','w'},{'x':1,'y':2,'z':3,'w':4})
     True
     """
-    pass
+
+    #if alpha is 0 then return empty dictionary
+    if alpha == 0:
+        new_dict = {}
+    #else compute scalar multiplication
+    else:
+        new_dict = {}
+        for k in v.f.keys():
+            new_dict[k] = alpha * v.f[k]
+
+    return Vec(v.D, new_dict)
 
 def neg(v):
     """
@@ -169,7 +187,7 @@ def neg(v):
     True
 
     """
-    pass
+    return scalar_mul(v, -1)
 
 ###############################################################################################################################
 
