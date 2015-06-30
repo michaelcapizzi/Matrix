@@ -67,17 +67,17 @@ def row(p, n):
 
 comprehension_with_row = [row(i,20) for i in range(15)]
 
-comprehension_without_row = ...
+comprehension_without_row = [[z + i for i in range(20)] for z in range(15)]
 
 
 
 ## 4: (Problem 4) Probability Exercise 1
-Pr_f_is_even = ...
-Pr_f_is_odd = ...
+Pr_f_is_even = .5+.1+.1
+Pr_f_is_odd = .2+.1
 
 
 
 ## 5: (Problem 5) Probability Exercise 2
-Pr_g_is_1    = ...
-Pr_g_is_0or2 = ...
+Pr_g_is_1    = .2+.1+.1
+Pr_g_is_0or2 = .2+.2+.1+.1
 

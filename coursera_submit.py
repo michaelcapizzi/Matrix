@@ -16,7 +16,7 @@ import hashlib
 import pdb
 
 #command for submission
-#python3 coursera_submit python_lab.py
+#python3 coursera_submit [file name]
 
 
 SUBMIT_VERSION = '4.0'
