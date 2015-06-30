@@ -39,7 +39,21 @@ def create_voting_dict(strlist):
     The lists for each senator should preserve the order listed in voting data.
     In case you're feeling clever, this can be done in one line.
     """
-    pass
+
+    #split each line
+    list_split = [s.split() for s in strlist]           #split() used instead of split(" ") as recommended in forum --> error with MA
+
+    #create dictionary
+    new_dict = {}
+
+    for sen in list_split:
+        #convert voting record strings to int
+        sen_converted = [int(s) for s in sen[3:]]
+        #build dictionary entry
+        new_dict[sen[0]] = sen_converted
+
+    return new_dict
+
 
 
 
@@ -61,7 +75,8 @@ def policy_compare(sen_a, sen_b, voting_dict):
         
     You should definitely try to write this in one line.
     """
-    pass
+
+    return sum([a*b for (a,b) in zip(voting_dict[sen_a], voting_dict[sen_b])])
 
 
 
@@ -85,8 +100,31 @@ def most_similar(sen, voting_dict):
 
     Note that you can (and are encouraged to) re-use your policy_compare procedure.
     """
-    
-    return ""
+
+    record = {}
+
+    #build similarity dictionary
+    for senator in voting_dict.keys():
+        #skip self
+        if senator == sen:
+            continue
+        else:
+            record[senator] = policy_compare(sen, senator, voting_dict)
+
+    #create max accumulator
+        #(similarity, senator's name)
+        #start with very negative similarity score to avoid matching it initially
+    accum = (-100, "")
+
+    #iterate through values to find max similarity
+    for senator in record.keys():
+        if record[senator] > accum[0]:
+            accum = (record[senator], senator)
+        else:
+            continue
+
+    #return name of senator housed in accum
+    return accum[1]
 
 
 
@@ -107,13 +145,36 @@ def least_similar(sen, voting_dict):
         >>> least_similar('c', vd)
         'b'
     """
-    pass
+    record = {}
+
+    #build similarity dictionary
+    for senator in voting_dict.keys():
+        #skip self
+        if senator == sen:
+            continue
+        else:
+            record[senator] = policy_compare(sen, senator, voting_dict)
+
+            #create min accumulator
+            #(similarity, senator's name)
+            #start with very positive similarity score to avoid matching it initially
+    accum = (100, "")
+
+    #iterate through values to find min similarity
+    for senator in record.keys():
+        if record[senator] < accum[0]:
+            accum = (record[senator], senator)
+        else:
+            continue
+
+    #return name of senator housed in accum
+    return accum[1]
 
 
 
 ## 5: (Task 2.12.5) Chafee, Santorum
-most_like_chafee    = ''
-least_like_santorum = '' 
+most_like_chafee    = "Jeffords"
+least_like_santorum = "Feingold"
 
 
 
@@ -132,7 +193,7 @@ def find_average_similarity(sen, sen_set, voting_dict):
         >>> vd == {'Klein':[1,1,1], 'Fox-Epstein':[1,-1,0], 'Ravella':[-1,0,0], 'Oyakawa':[-1,-1,-1], 'Loery':[0,1,1]}
         True
     """
-    return ...
+    return sum({policy_compare(sen, k, voting_dict) for k in sen_set}) / len(sen_set)
 
 most_average_Democrat = ... # give the last name (or code that computes the last name)
 
