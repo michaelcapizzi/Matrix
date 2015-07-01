@@ -92,7 +92,16 @@ def scale_vecs(vecdict):
     >>> [v in [Vec({1,2,4},{2: 3.0}), Vec({1,2,4},{1: 0.2, 2: 0.4, 4: 1.6})] for v in result]
     [True, True]
     '''
-    pass
+
+    domain = list(vecdict.values())[0].D
+
+    return [
+            Vec(domain, {
+                            a: (b/k) for (a,b) in z.f.items()       #scale the values in Vec.f
+                        }
+                ) for (k,z) in vecdict.items()
+            ]
+
 
 
 
@@ -119,19 +128,19 @@ def GF2_span(D, S):
 
 ## 4: (Problem 4) Is it a vector space 1
 # Answer with a boolean, please.
-is_a_vector_space_1 = ...
+is_a_vector_space_1 = False
 
 
 
 ## 5: (Problem 5) Is it a vector space 2
 # Answer with a boolean, please.
-is_a_vector_space_2 = ...
+is_a_vector_space_2 = True
 
 
 
 ## 6: (Problem 6) Is it a vector space 3
 # Answer with a boolean, please.
-is_a_vector_space_3 = ...
+is_a_vector_space_3 = False
 
 
 
