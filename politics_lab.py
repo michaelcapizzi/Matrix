@@ -199,7 +199,7 @@ most_average_Democrat = "Kennedy"
 
 #import politics_lab as pol
 #f = open("US_Senate_voting_data_109.txt")
-#mylist = list(f)
+#mylist = list(f)miccapiz
 #dems = pol.create_voting_dict([l for l in mylist if l.split()[1] == "D"])
 #sen_similarity = {}
 #for sen in dems.keys():
