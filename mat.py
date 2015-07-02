@@ -1,5 +1,7 @@
+coursera = 1
 # Copyright 2013 Philip N. Klein
 from vec import Vec
+
 
 #Test your Mat class over R and also over GF(2).  The following tests use only R.
 
@@ -13,7 +15,8 @@ def getitem(M, k):
     0
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
-    pass
+
+    return M.f.get((k[0], k[1]), 0)
 
 def equal(A, B):
     """
@@ -39,7 +42,24 @@ def equal(A, B):
     True
     """
     assert A.D == B.D
-    pass
+
+    #make A dense
+    for i in A.D[0]:
+        for j in A.D[1]:
+            if (i,j) not in A.f.keys():
+                A.f[(i,j)] = 0
+            else:
+                continue
+
+    #make B dense
+    for i in B.D[0]:
+        for j in B.D[1]:
+            if (i,j) not in B.f.keys():
+                B.f[(i,j)] = 0
+            else:
+                continue
+
+    return True if A.f == B.f else False
 
 def setitem(M, k, val):
     """
@@ -59,7 +79,8 @@ def setitem(M, k, val):
     True
     """
     assert k[0] in M.D[0] and k[1] in M.D[1]
-    pass
+
+    M.f[k] = val
 
 def add(A, B):
     """
@@ -87,7 +108,15 @@ def add(A, B):
     True
     """
     assert A.D == B.D
-    pass
+
+    new_dict = {}
+
+    for i in A.D[0]:
+        for j in A.D[1]:
+            new_dict[(i,j)] = A.f.get((i,j),0) + B.f.get((i,j), 0)
+
+    return Mat(A.D, new_dict)
+
 
 def scalar_mul(M, x):
     """
@@ -101,7 +130,20 @@ def scalar_mul(M, x):
     >>> 0.25*M == Mat(({1,3,5}, {2,4}), {(1,2):1.0, (5,4):0.5, (3,4):0.75})
     True
     """
-    pass
+
+    #if scalar is 0 then return empty dictionary
+    if x == 0:
+        new_dict = {}
+    #else compute scalar multiplication
+    else:
+        new_dict = {}
+
+        for i in M.D[0]:
+            for j in M.D[1]:
+                new_dict[(i,j)] = x * M[(i,j)]
+
+    return Mat(M.D, new_dict)
+
 
 def transpose(M):
     """
@@ -115,8 +157,23 @@ def transpose(M):
     >>> M.transpose() == Mt
     True
     """
-    pass
 
+    new_dict = {}
+    new_domain = (M.D[1], M.D[0])
+
+    for i in M.f.keys():
+        if M.f[i] != 0:
+            new_dict[(i[1], i[0])] = M.f[i]
+    # for i in M.D[0]:
+    #     for j in M.D[1]:
+    #         if (i,j) in M.f.keys() and M.f[(i,j)] != 0:
+    #             new_dict[(j,i)] = M.f[(i,j)]
+        else:
+            continue
+
+    return Mat(new_domain, new_dict)
+
+#TODO - more sparsity can come from adjusting vec.add
 def vector_matrix_mul(v, M):
     """
     returns the product of vector v and matrix M
@@ -142,8 +199,32 @@ def vector_matrix_mul(v, M):
     True
     """
     assert M.D[0] == v.D
-    pass
 
+    if M.f == {} or v.f == {}:
+        return Vec(M.D[1], {})
+    else:
+
+        #make list of column vectors
+        veclist = [Vec(M.D[1], {md1: M.f[(vd, md1)] * v.f[vd] for md1 in M.D[1] if (vd, md1) in M.f.keys() and M.f[(vd, md1)] != 0}) for vd in v.f.keys() if vd in v.f.keys() and v.f[vd] != 0]
+
+        #sum vectors in veclist
+        accum = veclist[0]
+
+        for i in range(1, len(veclist)):        #for i 1 to len(veclist)
+            accum = accum + veclist[i]
+
+        #remove 0s for sparsity
+        new_dict = {}
+        for k in accum.f.keys():
+            if accum.f[k] != 0:
+                new_dict[k] = accum.f[k]
+            else:
+                continue
+
+        #return accum                   #if not needed to remove 0s for sparsity
+        return Vec(M.D[1], new_dict)
+
+#TODO - more sparsity can come from adjusting vec.add
 def matrix_vector_mul(M, v):
     """
     Returns the product of matrix M and vector v.
@@ -169,8 +250,34 @@ def matrix_vector_mul(M, v):
     True
     """
     assert M.D[1] == v.D
-    pass
 
+    if M.f == {} or v.f == {}:
+        return Vec(M.D[0], {})
+    else:
+
+        #make list of column vectors
+        veclist = [Vec(M.D[0], {md0: M.f[(md0, vd)] * v.f[vd] for md0 in M.D[0] if (md0, vd) in M.f.keys() and M.f[(md0, vd)] != 0}) for vd in v.f.keys() if vd in v.f.keys() and v.f[vd] != 0]
+        # veclist = [Vec(M.D[0], {md0: M.f[(md0, vd)] * v.f[vd] for (md0,vd) in M.f.keys() if M.f[(md0, vd)] != 0}) for vd in v.f.keys() if vd in v.f.keys() and v.f[vd] != 0]
+
+        #sum vectors in veclist
+        accum = veclist[0]
+
+        for i in range(1, len(veclist)):        #for i 1 to len(veclist)
+            accum = accum + veclist[i]
+
+        #remove 0s for sparsity
+        new_dict = {}
+        for k in accum.f.keys():
+            if accum.f[k] != 0:
+                new_dict[k] = accum.f[k]
+            else:
+                continue
+
+        #return accum                   #if not needed to remove 0s for sparsity
+        return Vec(M.D[0], new_dict)
+
+
+#TODO - more sparsity can come from adjusting vec.add
 def matrix_matrix_mul(A, B):
     """
     Returns the result of the matrix-matrix multiplication, A*B.
