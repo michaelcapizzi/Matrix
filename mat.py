@@ -305,7 +305,25 @@ def matrix_matrix_mul(A, B):
     True
     """
     assert A.D[1] == B.D[0]
-    pass
+
+    #make a vector of each matrix row
+        #doesn't work ==> repeats second row
+    #[Vec(M.D[1], {j:M.f[(i,j)] for i in M.D[0] for j in M.D[1]}) for v in range(len(M.D[0]))]
+    #treat it like multiple vector_matrix_mul problems where each row of matrix is a vector
+    #DONE ==> convert list of vector-rows into matrix
+    #Mat(({0,1}, a.D), {(i,j): ab[i].f[j] for i in {0,1} for j in a.D})
+
+
+    if A.f == {} or B.f == {}:
+        return Mat(A.D, {})
+    else:
+
+
+
+
+
+
+
 
 ################################################################################
 
