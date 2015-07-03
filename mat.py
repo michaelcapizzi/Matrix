@@ -200,7 +200,7 @@ def vector_matrix_mul(v, M):
     """
     assert M.D[0] == v.D
 
-    if M.f == {} or v.f == {}:
+    if M.f == {} or v.f == {} or set(v.f.values()) == {0}:
         return Vec(M.D[1], {})
     else:
 
@@ -251,7 +251,7 @@ def matrix_vector_mul(M, v):
     """
     assert M.D[1] == v.D
 
-    if M.f == {} or v.f == {}:
+    if M.f == {} or v.f == {} or set(v.f.values()) == {0}:
         return Vec(M.D[0], {})
     else:
 
@@ -277,6 +277,7 @@ def matrix_vector_mul(M, v):
         return Vec(M.D[0], new_dict)
 
 
+#TODO - add sparsity implementation
 #TODO - more sparsity can come from adjusting vec.add
 def matrix_matrix_mul(A, B):
     """
@@ -307,17 +308,22 @@ def matrix_matrix_mul(A, B):
     assert A.D[1] == B.D[0]
 
     #make a vector of each matrix row
-        #doesn't work ==> repeats second row
-    #[Vec(M.D[1], {j:M.f[(i,j)] for i in M.D[0] for j in M.D[1]}) for v in range(len(M.D[0]))]
+        #from matutil
+    #{row:Vec(A.D[1], {col:A[row,col] for col in A.D[1]}) for row in A.D[0]}
     #treat it like multiple vector_matrix_mul problems where each row of matrix is a vector
     #DONE ==> convert list of vector-rows into matrix
     #Mat(({0,1}, a.D), {(i,j): ab[i].f[j] for i in {0,1} for j in a.D})
 
+    rowdomain = A.D[0]
+    columndomain = B.D[1]
 
     if A.f == {} or B.f == {}:
-        return Mat(A.D, {})
+        return Mat((rowdomain, columndomain), {})
     else:
-
+        mat2vecsdict = {row:Vec(A.D[1], {col:A[row,col] for col in A.D[1] if A[row,col] != 0}) for row in A.D[0]}
+        mat2vecs = [v for v in mat2vecsdict.values()]       #does this always maintain the order of rows?
+        mat = [v * B for v in mat2vecs]
+        return Mat((rowdomain, columndomain), {(list(rowdomain)[i],j): mat[i].f[j] for i in range(len(rowdomain)) for j in columndomain if j in mat[i].f.keys()})
 
 
 
